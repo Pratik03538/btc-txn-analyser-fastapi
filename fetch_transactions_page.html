@@ -1,0 +1,73 @@
+<!-- Dynamic Content for the Fetch Transactions Page -->
+<header class="mb-8">
+    <h1 class="text-2xl sm:text-3xl font-bold text-white text-center">Fetch Block Transactions</h1>
+    <p class="text-center text-gray-400 mt-2">Retrieve historical transaction data directly from the Bitcoin blockchain.</p>
+</header>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <!-- Option 1: Fetch Latest Block -->
+    <div class="luxury-card rounded-xl p-6 flex flex-col items-center justify-center text-center">
+        <h2 class="text-xl font-bold text-yellow-400">Latest Block</h2>
+        <p class="text-gray-400 my-4 text-sm h-10">Quickly fetch all transactions from the single most recent block.</p>
+        <button id="fetch-latest-button" class="bg-yellow-500 hover:bg-yellow-600 w-full text-stone-900 font-bold px-5 py-3 rounded-md text-base shadow-lg transition-transform transform hover:scale-105 flex items-center justify-center space-x-2">
+            <ion-icon name="flash-outline" class="h-5 w-5"></ion-icon>
+            <span>Fetch Latest</span>
+        </button>
+    </div>
+
+    <!-- Option 2: Fetch Multiple Blocks -->
+    <div class="luxury-card rounded-xl p-6 flex flex-col items-center justify-center text-center">
+        <h2 class="text-xl font-bold text-yellow-400">Multiple Blocks</h2>
+        <p class="text-gray-400 my-4 text-sm h-10">Fetch transactions from a specified number of recent blocks.</p>
+        <div class="flex items-center justify-center gap-2 w-full">
+            <button id="decr-button" class="bg-stone-700 hover:bg-stone-600 rounded-md p-3 font-bold text-xl leading-none">-</button>
+            <input type="number" id="num-blocks-input" value="3" min="1" max="10" class="bg-stone-800 border border-stone-700 rounded-md w-24 text-center py-2 text-lg font-bold focus:ring-yellow-500 focus:border-yellow-500">
+            <button id="incr-button" class="bg-stone-700 hover:bg-stone-600 rounded-md p-3 font-bold text-xl leading-none">+</button>
+        </div>
+        <button id="fetch-multiple-button" class="bg-stone-800 border border-stone-700 hover:bg-stone-700 w-full text-yellow-400 font-bold px-5 py-3 mt-4 rounded-md text-base shadow-lg transition-transform transform hover:scale-105 flex items-center justify-center space-x-2">
+            <ion-icon name="download-outline" class="h-5 w-5"></ion-icon>
+            <span>Fetch <span id="num-blocks-display">3</span> Blocks</span>
+        </button>
+    </div>
+</div>
+
+<!-- Progress Bar and Status -->
+<div id="progress-container" class="mt-8 hidden">
+    <p id="progress-status" class="text-center text-gray-400 mb-2">Fetching...</p>
+    <div class="w-full bg-stone-800 rounded-full h-2.5">
+        <div id="progress-bar" class="bg-yellow-500 h-2.5 rounded-full" style="width: 0%"></div>
+    </div>
+</div>
+
+<!-- Results Container -->
+<div id="transactions-container" class="space-y-4 mt-8">
+    <!-- Fetched transactions will be displayed here -->
+</div>
+
+<!-- Live Transaction Feed -->
+<div class="mt-12 border-t border-stone-800 pt-8">
+    <header class="mb-4 text-center">
+        <h2 class="text-2xl font-bold text-white">Live Transaction Feed</h2>
+        <p class="text-gray-400 mt-1">Watch unconfirmed transactions from the mempool in real-time.</p>
+    </header>
+
+    <div class="luxury-card rounded-xl p-6">
+        <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+                <div id="live-status-indicator" class="h-3 w-3 rounded-full bg-red-500 transition-colors"></div>
+                <span id="live-status-text" class="text-gray-400 text-sm font-medium">Disconnected</span>
+            </div>
+            <button id="toggle-live-feed-button" class="bg-green-600 hover:bg-green-700 text-white font-bold px-5 py-2.5 rounded-md text-sm shadow-lg transition-colors flex items-center space-x-2">
+                <ion-icon name="play-circle-outline" class="h-5 w-5"></ion-icon>
+                <span>Start Feed</span>
+            </button>
+        </div>
+
+        <div id="live-transactions-container" class="space-y-3 max-h-[50vh] overflow-y-auto pr-2">
+             <div class="flex items-center justify-center h-48">
+                <p class="text-gray-500 text-center">Start the feed to see live transactions.</p>
+             </div>
+        </div>
+    </div>
+</div>
+

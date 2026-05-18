@@ -1,0 +1,30 @@
+# Environments
+venv/
+env/
+.env
+
+# Python Cache
+__pycache__/
+*.pyc
+
+# IDEs
+.idea/
+.vscode/
+
+# Database files (DO NOT UPLOAD DATABASES TO GITHUB)
+*.db
+*.sqlite3
+
+# OS generated files
+.DS_Store
+Thumbs.db
+```eof
+
+Ab neeche diye gaye **3 simple steps** ko apne PyCharm me follow karein:
+
+### Step 1: `requirements.txt` Automatically Generate Karein
+PyCharm khud aapke project me install kiye gaye packages ki list bana sakta hai.
+1. PyCharm me sabse neeche **Terminal** tab par click karein.
+2. Terminal me yeh command type karein aur `Enter` dabayein:
+   ```bash
+   pip freeze > requirements.txt

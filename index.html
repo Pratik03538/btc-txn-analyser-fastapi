@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitcoin Luxury Dashboard</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial@0.1.1/dist/chartjs-chart-financial.min.js"></script>
+
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #0c0a09; }
+        .luxury-card { background-color: rgba(28, 25, 23, 0.6); backdrop-filter: blur(10px); border: 1px solid rgba(252, 211, 77, 0.1); transition: all 0.3s ease; }
+        .luxury-card:hover { border-color: rgba(252, 211, 77, 0.4); transform: translateY(-5px); }
+        .positive-change { color: #22c55e; }
+        .negative-change { color: #ef4444; }
+        .gold-text { color: #facc15; }
+        .nav-item-active { background-color: #facc15; color: #1c1917; }
+
+        @keyframes price-flash { 0% { color: #ffffff; } 50% { color: #facc15; text-shadow: 0 0 10px #facc15; } 100% { color: #ffffff; } }
+        .flash-update { animation: price-flash 1s ease-out; }
+
+        .popup-overlay { transition: opacity 0.3s ease-in-out; }
+        .popup-modal { transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out; }
+
+        .risk-o-meter-arc { transition: stroke-dashoffset 1s ease-out; }
+    </style>
+</head>
+<body class="text-gray-200 min-h-screen">
+
+    <nav class="bg-stone-900/50 backdrop-blur-lg border-b border-stone-800 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex-shrink-0"><div class="flex items-center space-x-2"><svg class="h-8 w-8 gold-text" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M17.026 14.735c.168-.999-.348-1.785-1.185-2.227.816-.431 1.29-1.233 1.132-2.203-.186-1.116-.961-1.802-2.16-2.022l.33-1.325-1.026-.256-.32 1.282c-.313-.078-.636-.151-.958-.223l.325-1.302-1.026-.256-.329 1.325c-.26-.065-.516-.128-.768-.19l.001-.004-1.383-.345-.345 1.382s.872.213.854.223c.474.118.591.442.569.688-.022.246-.223.48-.687.369l-.001-.003-1.077-.269-1.026 4.113c.045.012.118.02.19.034l-.193-.047-.003.008c-.463.116-.74.45-.712.735.028.285.3.506.757.389.07-.017.14-.035.208-.054l.504 2.023c-.08.02-.15.04-.219.06-.48.118-.696.446-.667.732.029.286.31.503.776.383.065-.017.13-.034.195-.052l.33 1.325 1.026 .256-.328-1.32c.338.093.672.181.999.263l-.324 1.299 1.026.256.33-1.325c1.784.446 3.129.13 3.66-1.521zm-2.535-5.925c.342.086.586.355.626.655.04.3-.156.593-.5.679l-.734.184-.205-.823.813-.2zM14.08 15c-.39.097-.733.32-.82.645-.088.324.076.655.466.752l.926.231.205-.823-.777-.193z"/></svg><span class="text-xl font-bold text-white">CryptoDash</span></div></div>
+                <div class="hidden md:flex items-center space-x-4">
+                    <a href="#" id="nav-dashboard" onclick="showPage('dashboard')" class="text-gray-300 px-3 py-2 rounded-md text-sm font-medium">Dashboard</a>
+                    <a href="#" id="nav-transactions" onclick="showPage('transactions')" class="text-gray-300 px-3 py-2 rounded-md text-sm font-medium">Fetch Transactions</a>
+                    <a href="#" id="nav-analyse" onclick="showPage('analyse')" class="text-gray-300 px-3 py-2 rounded-md text-sm font-medium">Analyse Transaction</a>
+                    <a href="#" id="nav-scam" onclick="showPage('scam')" class="text-gray-300 px-3 py-2 rounded-md text-sm font-medium">Scam Detection</a>
+                </div>
+                <div class="md:hidden"><button id="mobile-menu-button" class="text-gray-300 hover:text-white"><ion-icon name="menu-outline" class="h-6 w-6"></ion-icon></button></div>
+            </div>
+        </div>
+        <div id="mobile-menu" class="md:hidden hidden"><div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+            <a href="#" onclick="showPage('dashboard'); closeMobileMenu();" class="text-gray-300 block px-3 py-2 rounded-md text-base font-medium">Dashboard</a>
+            <a href="#" onclick="showPage('transactions'); closeMobileMenu();" class="text-gray-300 block px-3 py-2 rounded-md text-base font-medium">Fetch Transactions</a>
+            <a href="#" onclick="showPage('analyse'); closeMobileMenu();" class="text-gray-300 block px-3 py-2 rounded-md text-base font-medium">Analyse Transaction</a>
+            <a href="#" onclick="showPage('scam'); closeMobileMenu();" class="text-gray-300 block px-3 py-2 rounded-md text-base font-medium">Scam Detection</a>
+        </div></div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+        <div id="dashboard-page"></div>
+        <div id="transactions-page" class="hidden"></div>
+        <div id="analyse-page" class="hidden"></div>
+        <div id="scam-page" class="hidden"></div>
+    </div>
+    <div id="popup-container"></div>
+
+    <script>
+        // --- Global State ---
+        let priceElement, priceChangeContainer, statusIndicator, chartCanvas, chartContext, chartErrorMessage, refreshButton, lastUpdatedElement, priceChart, scamChart;
+        let liveFeedSocket = null;
+        const MAX_LIVE_TX = 25;
+
+        // --- Page Navigation & Component Loading ---
+        const pages = ['dashboard', 'transactions', 'analyse', 'scam'];
+        const navItems = { dashboard: document.getElementById('nav-dashboard'), transactions: document.getElementById('nav-transactions'), analyse: document.getElementById('nav-analyse'), scam: document.getElementById('nav-scam') };
+
+        async function showPage(pageName) {
+            if (liveFeedSocket) stopLiveFeed();
+            pages.forEach(p => { const el = document.getElementById(`${p}-page`); if(el) el.classList.add('hidden'); navItems[p]?.classList.remove('nav-item-active'); });
+
+            const pageContainer = document.getElementById(`${pageName}-page`);
+            if (!pageContainer) return;
+
+            if (pageName !== 'dashboard' && pageContainer.innerHTML.trim() === '') {
+                try {
+                    const fileNameMap = { transactions: 'fetch_transactions_page.html', analyse: 'analyse_transaction_page.html', scam: 'scam_detection_page.html' };
+                    const fileName = fileNameMap[pageName];
+                    if (!fileName) throw new Error(`Invalid page name: ${pageName}`);
+                    const response = await fetch(`/${fileName}`);
+                    if (!response.ok) throw new Error(`Could not load component: ${fileName}`);
+                    pageContainer.innerHTML = await response.text();
+                    if (pageName === 'transactions') attachTransactionPageListeners();
+                    if (pageName === 'analyse') attachAnalysePageListeners();
+                    if (pageName === 'scam') attachScamDetectionListeners();
+                } catch (error) { pageContainer.innerHTML = `<div class="text-center py-8 text-red-400"><strong>Error:</strong> ${error.message}</div>`; }
+            }
+            pageContainer.classList.remove('hidden');
+            navItems[pageName]?.classList.add('nav-item-active');
+        }
+        function closeMobileMenu() { document.getElementById('mobile-menu')?.classList.add('hidden'); }
+
+        // --- Dashboard Logic ---
+        function initializeChart(chartData) { if(priceChart) priceChart.destroy(); priceChart = new Chart(chartContext, { type: 'candlestick', data: { datasets: [{ label: 'BTC/INR Candlestick', data: chartData }] }, options: { responsive: true, maintainAspectRatio: false, scales: { x: { type: 'time', time: { unit: 'hour' } }, y: { grid: { color: 'rgba(255,255,255,0.1)' } } }, plugins: { legend: { display: false } } } }); }
+        async function fetchDashboardData() {
+            if (!refreshButton) return;
+            refreshButton.classList.add('animate-spin'); statusIndicator.className = 'h-3 w-3 rounded-full bg-yellow-500 animate-pulse';
+            try {
+                const response = await fetch('/dashboard/data'); const data = await response.json(); if (!response.ok) throw new Error(data.detail);
+                statusIndicator.className = 'h-3 w-3 rounded-full bg-green-500'; lastUpdatedElement.textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
+                priceElement.textContent = `₹${data.price.toLocaleString()}`;
+                const changeClass = data.change_24h_percent >= 0 ? 'positive-change' : 'negative-change';
+                const changeSymbol = data.change_24h_percent >= 0 ? '▲' : '▼';
+                priceChangeContainer.innerHTML = `<span class="${changeClass}">${changeSymbol} ₹${Math.abs(data.change_24h).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} (${data.change_24h_percent.toFixed(2)}%) 24h</span>`;
+                chartErrorMessage.classList.add('hidden'); chartCanvas.style.display = 'block';
+                initializeChart(data.chart_data);
+            } catch (error) {
+                statusIndicator.className = 'h-3 w-3 rounded-full bg-red-500'; lastUpdatedElement.textContent = `Update failed`; priceElement.textContent = 'Error';
+                priceChangeContainer.innerHTML = `<span class="text-red-400">${error.message}</span>`;
+                if(chartCanvas) chartCanvas.style.display = 'none';
+                if(chartErrorMessage) { chartErrorMessage.classList.remove('hidden'); chartErrorMessage.textContent = `Chart Error: ${error.message}`; }
+            } finally {
+                refreshButton.classList.remove('animate-spin');
+            }
+        }
+
+        // --- Transactions Logic ---
+        function attachTransactionPageListeners() {
+            document.getElementById('fetch-latest-button')?.addEventListener('click', () => fetchAndDisplayTransactions(1, document.getElementById('fetch-latest-button')));
+            document.getElementById('fetch-multiple-button')?.addEventListener('click', () => fetchAndDisplayTransactions(document.getElementById('num-blocks-input').value, document.getElementById('fetch-multiple-button')));
+            const numBlocksInput = document.getElementById('num-blocks-input');
+            const numBlocksDisplay = document.getElementById('num-blocks-display');
+            const updateBlockCount = () => { let val = parseInt(numBlocksInput.value); if (val < 1) val = 1; if (val > 10) val = 10; numBlocksInput.value = val; numBlocksDisplay.textContent = val; };
+            numBlocksInput?.addEventListener('input', updateBlockCount);
+            document.getElementById('decr-button')?.addEventListener('click', () => { numBlocksInput.stepDown(); updateBlockCount(); });
+            document.getElementById('incr-button')?.addEventListener('click', () => { numBlocksInput.stepUp(); updateBlockCount(); });
+            document.getElementById('toggle-live-feed-button')?.addEventListener('click', toggleLiveFeed);
+        }
+        async function fetchAndDisplayTransactions(blockCount, button) {
+            const txContainer = document.getElementById('transactions-container'); const progressContainer = document.getElementById('progress-container'); const progressBar = document.getElementById('progress-bar'); const progressStatus = document.getElementById('progress-status'); const originalButtonContent = button.innerHTML; button.disabled = true; document.getElementById('fetch-latest-button').disabled = true; document.getElementById('fetch-multiple-button').disabled = true; button.innerHTML = `<span>Fetching...</span>`; progressContainer.classList.remove('hidden'); let progress = 0; const interval = setInterval(() => { progress = Math.min(progress + 5, 95); progressBar.style.width = `${progress}%`; }, 200); try { const response = await fetch(`/transactions/fetch?blocks=${blockCount}`); const transactions = await response.json(); if (!response.ok) throw new Error(transactions.detail); clearInterval(interval); progressBar.style.width = '100%'; progressStatus.textContent = `Completed! Found ${transactions.length} transactions.`; txContainer.innerHTML = ''; transactions.forEach(tx => { const card = document.createElement('div'); card.className = 'luxury-card rounded-lg p-4 flex flex-wrap justify-between items-center cursor-pointer'; card.onclick = () => showTransactionPopup(tx.hash); card.innerHTML = `<div class="w-full md:w-1/2 mb-2 md:mb-0"><p class="text-xs text-gray-400">Hash</p><p class="font-mono text-sm text-yellow-400 truncate">${tx.hash}</p></div><div class="text-center w-1/3 md:w-auto"><p class="text-xs text-gray-400">Block</p><p class="text-sm">${tx.block}</p></div><div class="text-center w-1/3 md:w-auto"><p class="text-xs text-gray-400">I/O</p><p class="text-sm">${tx.input_count}/${tx.output_count}</p></div><div class="text-right w-1/3 md:w-auto"><p class="text-xs text-gray-400">Amount (BTC)</p><p class="font-bold text-lg">${tx.output_value_btc.toFixed(6)}</p></div>`; txContainer.appendChild(card); }); } catch (error) { clearInterval(interval); progressBar.style.width = '100%'; progressBar.classList.add('bg-red-500'); progressStatus.textContent = `Error!`; txContainer.innerHTML = `<div class="text-red-400"><strong>Error:</strong> ${error.message}</div>`; } finally { button.innerHTML = originalButtonContent; button.disabled = false; document.getElementById('fetch-latest-button').disabled = false; document.getElementById('fetch-multiple-button').disabled = false; }
+        }
+        function toggleLiveFeed() { if (liveFeedSocket) stopLiveFeed(); else startLiveFeed(); }
+        function startLiveFeed() {
+            const toggleBtn = document.getElementById('toggle-live-feed-button'); const statusIndicator = document.getElementById('live-status-indicator'); const statusText = document.getElementById('live-status-text'); const liveContainer = document.getElementById('live-transactions-container');
+            toggleBtn.disabled = true; statusText.textContent = 'Connecting...'; statusIndicator.className = 'h-3 w-3 rounded-full bg-yellow-500 animate-pulse';
+            if (liveContainer.querySelector('p')) { liveContainer.innerHTML = ''; }
+            const wsUrl = "wss://ws.blockchain.info/inv";
+            liveFeedSocket = new WebSocket(wsUrl);
+            liveFeedSocket.onopen = () => {
+                liveFeedSocket.send('{"op":"unconfirmed_sub"}');
+                toggleBtn.disabled = false; toggleBtn.innerHTML = `<ion-icon name="stop-circle-outline" class="h-5 w-5"></ion-icon><span>Stop Feed</span>`;
+                toggleBtn.className = toggleBtn.className.replace('bg-green-600', 'bg-red-600').replace('hover:bg-green-700', 'hover:bg-red-700');
+                statusText.textContent = 'Connected'; statusIndicator.className = 'h-3 w-3 rounded-full bg-green-500';
+            };
+            liveFeedSocket.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                if (data.op === 'utx') {
+                    const tx = data.x;
+                    const outputValueBtc = tx.out.reduce((sum, o) => sum + o.value, 0) / 1e8;
+                    const card = document.createElement('div'); card.className = 'bg-stone-800/50 rounded-lg p-3 flex justify-between items-center opacity-0 translate-y-2 transition-all duration-500 cursor-pointer'; card.onclick = () => showTransactionPopup(tx.hash, true);
+                    card.innerHTML = `<div><p class="font-mono text-xs text-yellow-500 truncate" title="${tx.hash}">${tx.hash.substring(0, 25)}...</p><p class="text-xs text-gray-400">${tx.inputs.length} Ins / ${tx.out.length} Outs</p></div><div class="text-right"><p class="font-bold text-base text-white">${outputValueBtc.toFixed(6)} BTC</p></div>`;
+                    liveContainer.prepend(card);
+                    setTimeout(() => card.classList.remove('opacity-0', 'translate-y-2'), 10);
+                    if (liveContainer.children.length > MAX_LIVE_TX) { liveContainer.lastChild.remove(); }
+                }
+            };
+            liveFeedSocket.onclose = () => { stopLiveFeed(false); };
+            liveFeedSocket.onerror = (error) => { console.error("WebSocket Error:", error); statusText.textContent = 'Connection Error'; statusIndicator.className = 'h-3 w-3 rounded-full bg-red-500'; stopLiveFeed(); };
+        }
+        function stopLiveFeed(shouldClose = true) { if (liveFeedSocket) { if (shouldClose && liveFeedSocket.readyState === WebSocket.OPEN) { liveFeedSocket.close(); } liveFeedSocket = null; } const toggleBtn = document.getElementById('toggle-live-feed-button'); const statusIndicator = document.getElementById('live-status-indicator'); const statusText = document.getElementById('live-status-text'); if(toggleBtn){ toggleBtn.disabled = false; toggleBtn.innerHTML = `<ion-icon name="play-circle-outline" class="h-5 w-5"></ion-icon><span>Start Feed</span>`; toggleBtn.className = toggleBtn.className.replace('bg-red-600', 'bg-green-600').replace('hover:bg-red-700', 'hover:bg-green-700'); } if(statusIndicator) statusIndicator.className = 'h-3 w-3 rounded-full bg-red-500'; if(statusText) statusText.textContent = 'Disconnected'; }
+
+        // --- Analyse Logic ---
+        function attachAnalysePageListeners() { document.getElementById('analyse-tx-button')?.addEventListener('click', performTransactionAnalysis); }
+        async function performTransactionAnalysis() {
+            const input = document.getElementById('tx-hash-input'); const resultsContainer = document.getElementById('analysis-results-container'); const button = document.getElementById('analyse-tx-button'); const txHash = input.value.trim();
+            if (txHash.length !== 64) { resultsContainer.innerHTML = `<div class="text-center py-8 text-red-400"><strong>Invalid Input:</strong> Please enter a valid 64-character transaction hash.</div>`; return; }
+            button.disabled = true; button.innerHTML = `<span>Analysing...</span>`;
+            resultsContainer.innerHTML = `<div class="text-center py-12 text-gray-500"><ion-icon name="cog-outline" class="text-5xl animate-spin"></ion-icon><p>Fetching and analysing transaction...</p></div>`;
+            try {
+                const response = await fetch(`/analyse/transaction?tx_hash=${txHash}`); const result = await response.json(); if (!response.ok) throw new Error(result.detail || 'Analysis failed');
+                const { analysis, ...details } = result;
+                const getFeeColor = (level) => { if (level === 'High') return 'text-red-400'; if (level === 'Low') return 'text-green-400'; return 'text-yellow-400'; };
+                resultsContainer.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-3 gap-6"><div class="luxury-card rounded-xl p-6 md:col-span-1 flex flex-col items-center text-center"><ion-icon name="pulse-outline" class="text-5xl text-yellow-400"></ion-icon><h3 class="text-lg font-bold mt-2">Transaction Pattern</h3><p class="text-2xl font-semibold text-white">${analysis.pattern}</p><p class="text-sm text-gray-400 mt-1">${analysis.pattern_comment}</p></div><div class="luxury-card rounded-xl p-6 md:col-span-1 flex flex-col items-center text-center"><ion-icon name="cash-outline" class="text-5xl text-yellow-400"></ion-icon><h3 class="text-lg font-bold mt-2">Fee Level</h3><p class="text-2xl font-semibold ${getFeeColor(analysis.fee_level)}">${analysis.fee_level}</p><p class="text-sm text-gray-400 mt-1">${analysis.fee_comment}</p></div><div class="luxury-card rounded-xl p-6 md:col-span-1 flex flex-col items-center text-center"><ion-icon name="checkmark-circle-outline" class="text-5xl text-yellow-400"></ion-icon><h3 class="text-lg font-bold mt-2">Status</h3><p class="text-2xl font-semibold ${analysis.is_confirmed ? 'text-green-400' : 'text-gray-400'}">${analysis.is_confirmed ? 'Confirmed' : 'Unconfirmed'}</p><p class="text-sm text-gray-400 mt-1">${analysis.is_high_value ? 'This is a high-value transaction (>10 BTC).' : 'This is a standard-value transaction.'}</p></div></div><div class="mt-4 text-center"><button onclick="showTransactionPopup('${details.hash}')" class="text-yellow-500 hover:text-yellow-400 font-bold py-2 px-4 rounded-md text-sm"><ion-icon name="open-outline"></ion-icon><span>View Full Details</span></button></div>`;
+            } catch (error) { resultsContainer.innerHTML = `<div class="text-center py-8 text-red-400"><strong>Error:</strong> ${error.message}</div>`; } finally { button.disabled = false; button.innerHTML = `<span>Analyse</span>`; }
+        }
+
+        // --- Scam Detection Logic ---
+        function attachScamDetectionListeners() {
+            document.getElementById('analyse-latest-block-button')?.addEventListener('click', () => performInitialScan('latest', 1));
+            document.getElementById('analyse-multiple-blocks-button')?.addEventListener('click', () => performInitialScan('latest', document.getElementById('num-blocks-scam-input').value));
+            document.getElementById('analyse-height-button')?.addEventListener('click', () => performInitialScan(document.getElementById('block-height-input').value, 1));
+        }
+        async function performInitialScan(identifier, numBlocks) {
+            const initialStepContainer = document.getElementById('initial-analysis-step');
+            initialStepContainer.classList.remove('hidden');
+            initialStepContainer.innerHTML = `<div class="text-center py-8 text-gray-400"><ion-icon name="sync-outline" class="text-4xl animate-spin"></ion-icon><p>Fetching block info...</p></div>`;
+            document.getElementById('scam-results-container').innerHTML = '';
+            try {
+                if (!identifier && !document.getElementById('block-height-input')?.value) throw new Error("Block identifier is required.");
+                const blockId = identifier === 'latest' ? 'latest' : (identifier || document.getElementById('block-height-input').value);
+                const response = await fetch(`/scam/block-info?block_identifier=${blockId}&num_blocks=${numBlocks}`);
+                const info = await response.json();
+                if (!response.ok) throw new Error(info.detail);
+                initialStepContainer.innerHTML = `<div class="luxury-card rounded-xl p-6 text-center"><p>Initial Scan for Block(s) <span class="font-bold text-yellow-400">${info.start_block} - ${info.end_block}</span></p><p class="text-3xl font-bold my-2">${info.total_transactions.toLocaleString()}</p><p class="mb-4">Total Transactions Found</p><button id="deep-scan-button" class="bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-3 rounded-md"><ion-icon name="shield-outline"></ion-icon><span>Perform Deep Scan</span></button></div>`;
+                document.getElementById('deep-scan-button').onclick = () => performDeepScan(info.start_block, info.num_blocks);
+            } catch (error) { initialStepContainer.innerHTML = `<div class="text-center py-8 text-red-400"><strong>Error:</strong> ${error.message}</div>`; }
+        }
+        async function performDeepScan(start_block, num_blocks) {
+            const resultsContainer = document.getElementById('scam-results-container');
+            resultsContainer.innerHTML = `<div class="text-center py-12 text-gray-500"><ion-icon name="cog-outline" class="text-5xl animate-spin"></ion-icon><p>Performing deep scan...</p></div>`;
+            try {
+                const response = await fetch(`/scam/deep-scan?start_block=${start_block}&num_blocks=${num_blocks}`);
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.detail);
+                const riskColor = result.risk_level === "Critical" || result.risk_level === "High" ? "text-red-500" : result.risk_level === "Medium" ? "text-yellow-500" : "text-green-500";
+                let algorithmsHtml = result.algorithm_results.map(algo => `
+                    <div class="luxury-card rounded-lg p-4">
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center gap-2"><h4 class="font-bold text-yellow-400">${algo.name}</h4><ion-icon name="information-circle-outline" class="cursor-pointer" onclick='showAlgorithmInfoPopup(${JSON.stringify(algo).replace(/"/g, "&quot;")})'></ion-icon></div>
+                            <div class="text-sm"><strong>Risk:</strong> <span class="font-bold">${algo.risk_score}/100</span></div>
+                        </div>
+                        <p class="text-xs mt-1">${algo.comment}</p>
+                        ${algo.flagged_txs.length > 0 ? `<button onclick='showSuspiciousTxsPopup(${JSON.stringify(algo.name)}, ${JSON.stringify(algo.flagged_txs)})' class="text-xs text-yellow-600 hover:underline mt-2">Show ${algo.flagged_txs.length} TXs</button>` : ''}
+                    </div>`).join('');
+                resultsContainer.innerHTML = `
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="lg:col-span-1 space-y-4"><div class="luxury-card rounded-xl p-6 text-center"><h3>Risk-o-Meter</h3><p class="${riskColor}">${result.overall_scam_probability}% ${result.risk_level}</p></div><div class="luxury-card rounded-xl p-6"><h3>Transaction Health</h3><canvas id="scamChart"></canvas></div></div>
+                        <div class="lg:col-span-2 space-y-4">${algorithmsHtml}</div>
+                    </div>`;
+                const scamChartCtx = document.getElementById('scamChart').getContext('2d');
+                if(scamChart) scamChart.destroy();
+                scamChart = new Chart(scamChartCtx, { type: 'doughnut', data: { labels: result.graph_data.labels, datasets: [{ data: result.graph_data.data, backgroundColor: ['#22c55e', '#ef4444'] }] } });
+            } catch (error) { resultsContainer.innerHTML = `<div class="text-red-400"><strong>Deep Scan Failed:</strong> ${error.message}</div>`; }
+        }
+
+        // --- Popup Logic ---
+        function timeAgo(timestamp) { const seconds = Math.floor((new Date() - new Date(timestamp * 1000)) / 1000); let interval = seconds / 31536000; if (interval > 1) return Math.floor(interval) + " years ago"; interval = seconds / 2592000; if (interval > 1) return Math.floor(interval) + " months ago"; interval = seconds / 86400; if (interval > 1) return Math.floor(interval) + " days ago"; interval = seconds / 3600; if (interval > 1) return Math.floor(interval) + " hours ago"; interval = seconds / 60; if (interval > 1) return Math.floor(interval) + " minutes ago"; return Math.floor(seconds) + " seconds ago"; }
+        function showAlgorithmInfoPopup(algoDetails) {
+            const popupContainer = document.getElementById('popup-container');
+            const popupHtml = `<div class="popup-overlay fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4" onclick="closeAnyPopup()"><div class="popup-modal bg-stone-900 border border-stone-700 rounded-2xl w-full max-w-lg" onclick="event.stopPropagation()"><header class="p-4 border-b border-stone-700"><h2 class="text-xl font-bold text-yellow-400">${algoDetails.name}</h2></header><div class="p-6 space-y-4 text-sm"><p>${algoDetails.description}</p><div><h3>How it works (Simulated):</h3><p class="font-mono text-xs mt-1">${algoDetails.how_it_works}</p></div></div></div></div>`;
+            popupContainer.innerHTML = popupHtml;
+        }
+        function showSuspiciousTxsPopup(algoName, flaggedTxs) {
+            const popupContainer = document.getElementById('popup-container');
+            let txCardsHtml = flaggedTxs.map(tx => `<div class="bg-stone-800/50 rounded-lg p-3 cursor-pointer" onclick="showTransactionPopup('${tx.hash}', true)"><p class="font-mono text-xs text-yellow-500 truncate">${tx.hash}</p><p class="text-xs text-gray-400 mt-1">${tx.value_btc.toFixed(8)} BTC</p></div>`).join('');
+            popupContainer.innerHTML = `<div class="popup-overlay fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4" onclick="closeAnyPopup()"><div class="popup-modal bg-stone-900 border border-stone-700 rounded-2xl w-full max-w-2xl flex flex-col" onclick="event.stopPropagation()"><header class="p-4 border-b border-stone-700"><h2 class="text-xl text-yellow-400">Suspicious TXs: ${algoName}</h2></header><div class="p-6 space-y-3 max-h-[60vh] overflow-y-auto">${txCardsHtml}</div></div></div>`;
+        }
+        async function showTransactionPopup(txHash, fromScamContext = false) {
+            const popupContainer = document.getElementById('popup-container');
+            const response = await fetch('/transaction_popup.html');
+            popupContainer.innerHTML = await response.text();
+
+            const popupOverlay = document.getElementById('transaction-popup-overlay');
+            const popupModal = document.getElementById('transaction-popup');
+            setTimeout(() => { popupOverlay.classList.remove('opacity-0'); popupModal.classList.remove('scale-95', 'opacity-0'); }, 10);
+
+            try {
+                const detailsPromise = fetch(`/transactions/details/${txHash}`).then(res => res.json());
+                const scamPromise = fromScamContext ? fetch(`/scam/analyse-tx/${txHash}`).then(res => res.json()) : Promise.resolve(null);
+                const [d, scamAnalysis] = await Promise.all([detailsPromise, scamPromise]);
+                if (d.detail) throw new Error(d.detail);
+
+                document.getElementById('popup-tx-hash').textContent = d.hash;
+                document.getElementById('popup-tx-amount').textContent = `${d.amount_btc.toFixed(8)} BTC`;
+                document.getElementById('popup-tx-fee').textContent = `${d.fee_sats.toLocaleString()} SATS (${d.fee_btc.toFixed(8)} BTC)`;
+                document.getElementById('popup-tx-from-summary').innerHTML = d.is_coinbase ? `<p class="font-bold text-sm">Coinbase (New Coins)</p>` : `<p class="font-mono text-sm text-gray-300 truncate">${d.inputs[0]?.address || 'Unknown'}</p>`;
+                document.getElementById('popup-tx-to-summary').innerHTML = `<p class="font-bold text-sm">${d.outputs_count} Outputs</p>`;
+                const statusEl = document.getElementById('popup-tx-status');
+                if(d.block_id) { statusEl.textContent = 'Confirmed'; statusEl.className = 'bg-green-500/20 text-green-400 text-sm font-medium px-2.5 py-0.5 rounded'; }
+                else { statusEl.textContent = 'Unconfirmed'; statusEl.className = 'bg-yellow-500/20 text-yellow-400 text-sm font-medium px-2.5 py-0.5 rounded'; }
+
+                if(scamAnalysis && !scamAnalysis.detail) {
+                    document.getElementById('popup-tx-risk-section').classList.remove('hidden');
+                    const riskScoreEl = document.getElementById('popup-tx-risk-score');
+                    riskScoreEl.textContent = `${scamAnalysis.risk_score}/100 Score`;
+                    riskScoreEl.className = `text-lg font-bold ${scamAnalysis.risk_score > 50 ? 'text-red-400' : 'text-yellow-400'}`;
+                    document.getElementById('popup-tx-risk-reasons').innerHTML = scamAnalysis.reasons.map(r => `<li>${r}</li>`).join('');
+                }
+
+                document.getElementById('popup-advanced-details').innerHTML = `
+                    <div><p class="text-xs text-gray-400">Block ID</p><p class="font-mono text-yellow-400">${d.block_id?.toLocaleString() || 'N/A'}</p></div>
+                    <div><p class="text-xs text-gray-400">Time</p><p>${d.time_formatted}</p></div>
+                    <div><p class="text-xs text-gray-400">Age</p><p>${timeAgo(d.time_raw)}</p></div>
+                    <div><p class="text-xs">Inputs</p><p>${d.inputs_count}</p></div>
+                    <div><p class="text-xs">Outputs</p><p>${d.outputs_count}</p></div>
+                    <div><p class="text-xs">Input Value</p><p>${d.input_value_btc.toFixed(8)} BTC</p></div>
+                    <div><p class="text-xs">Output Value</p><p>${d.output_value_btc.toFixed(8)} BTC</p></div>
+                    <div><p class="text-xs">Fee/Byte</p><p>${d.fee_per_byte.toFixed(2)} sat/B</p></div>
+                    <div><p class="text-xs">Fee/vByte</p><p>${d.fee_per_vb.toFixed(2)} sat/vB</p></div>
+                    <div><p class="text-xs">Size</p><p>${d.size.toLocaleString()} bytes</p></div>
+                    <div><p class="text-xs">Weight</p><p>${d.weight.toLocaleString()} ${d.weight_unit}</p></div>
+                    <div><p class="text-xs">Locktime</p><p>${d.locktime}</p></div>
+                    <div><p class="text-xs">Version</p><p>${d.version}</p></div>
+                    <div><p class="text-xs">RBF</p><p>${d.rbf ? 'Yes' : 'No'}</p></div>
+                    <div><p class="text-xs">Coinbase</p><p>${d.is_coinbase ? 'Yes' : 'No'}</p></div>
+                `;
+                document.getElementById('popup-from-header').textContent = `From (${d.inputs_count})`;
+                document.getElementById('popup-to-header').textContent = `To (${d.outputs_count})`;
+                document.getElementById('popup-from-list').innerHTML = d.inputs.map(i => `<div class="flex justify-between items-center py-2 border-b border-stone-700/50"><p class="font-mono text-sm text-gray-400 truncate">${i.address}</p><p class="font-bold text-sm text-right">${i.value_btc.toFixed(8)} BTC</p></div>`).join('') || '<p class="text-gray-500 text-sm">Coinbase (New Coins)</p>';
+                document.getElementById('popup-to-list').innerHTML = d.outputs.map(o => `<div class="flex justify-between items-center py-2 border-b border-stone-700/50"><p class="font-mono text-sm text-gray-400 truncate">${o.address}</p><p class="font-bold text-sm text-right">${o.value_btc.toFixed(8)} BTC</p></div>`).join('');
+            } catch (error) { document.getElementById('popup-content-body').innerHTML = `<div class="p-8 text-center text-red-400"><strong>Error:</strong> ${error.message}</div>`; }
+        }
+        function closeAnyPopup() { document.getElementById('popup-container').innerHTML = ''; }
+
+        // --- Initial Setup ---
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                document.getElementById('dashboard-page').innerHTML = `
+                    <header class="flex items-center justify-between mb-8 flex-wrap"><div class="flex items-center space-x-4"><h1 class="text-2xl sm:text-3xl font-bold text-white">Live Bitcoin Data</h1><button id="refresh-button" title="Refresh Data" class="text-gray-400 hover:text-white"><ion-icon name="refresh-outline" class="h-6 w-6"></ion-icon></button></div><div class="flex items-center space-x-3"><p id="last-updated" class="text-xs text-gray-500 mt-2 sm:mt-0">Connecting...</p><div id="status-indicator" class="h-3 w-3 rounded-full bg-yellow-500 animate-pulse"></div></div></header>
+                    <main class="grid grid-cols-1 gap-6"><div class="luxury-card rounded-xl p-6"><h2 class="text-sm font-medium text-gray-400">Current Price (INR)</h2><p id="current-price" class="text-4xl sm:text-5xl font-bold">Loading...</p><div id="price-change-container" class="mt-2"></div></div><div class="luxury-card rounded-xl p-6 h-96 relative"><h2 class="text-sm font-medium text-gray-400 mb-4">Price History (24H)</h2><canvas id="priceChart"></canvas><div id="chart-error-message" class="absolute inset-0 hidden"></div></div></main>
+                `;
+                priceElement = document.getElementById('current-price'); priceChangeContainer = document.getElementById('price-change-container'); statusIndicator = document.getElementById('status-indicator'); chartCanvas = document.getElementById('priceChart'); chartContext = chartCanvas.getContext('2d'); chartErrorMessage = document.getElementById('chart-error-message'); refreshButton = document.getElementById('refresh-button'); lastUpdatedElement = document.getElementById('last-updated');
+
+                document.getElementById('mobile-menu-button')?.addEventListener('click', () => document.getElementById('mobile-menu')?.classList.toggle('hidden'));
+                refreshButton?.addEventListener('click', fetchDashboardData);
+                window.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeAnyPopup(); });
+
+                showPage('dashboard');
+                fetchDashboardData();
+                setInterval(fetchDashboardData, 90000);
+            } catch (error) {
+                console.error("Critical initialization error:", error);
+                document.body.innerHTML = `<div class="flex items-center justify-center h-screen"><div class="text-center p-8 bg-stone-800 rounded-lg"><h1 class="text-2xl text-red-500">Application Error</h1><p>${error.message}</p></div></div>`;
+            }
+        });
+    </script>
+</body>
+</html>
+

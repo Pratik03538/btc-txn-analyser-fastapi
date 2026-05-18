@@ -1,0 +1,79 @@
+<!-- Universal Transaction Popup Component -->
+<div id="transaction-popup-overlay" onclick="closeAnyPopup()" class="popup-overlay fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 opacity-0">
+    <div id="transaction-popup" onclick="event.stopPropagation()" class="popup-modal bg-stone-900 border border-stone-700 rounded-2xl w-full max-w-5xl max-h-[90vh] flex flex-col scale-95 opacity-0">
+        <!-- Header -->
+        <header class="flex items-center justify-between p-4 border-b border-stone-700">
+            <div class="flex items-center gap-3">
+                <div class="bg-yellow-500 text-stone-900 rounded-lg p-2 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                </div>
+                <h2 class="text-xl font-bold text-white">Bitcoin Transaction</h2>
+            </div>
+            <button onclick="closeAnyPopup()" class="text-gray-400 hover:text-white text-3xl leading-none">&times;</button>
+        </header>
+
+        <!-- Main Content: Replaced with detailed structure -->
+        <div id="popup-content-body" class="flex-grow overflow-y-auto">
+            <div class="flex flex-col lg:flex-row">
+                <!-- Left Sidebar -->
+                <div class="w-full lg:w-1/3 border-b lg:border-b-0 lg:border-r border-stone-700 p-5 space-y-4">
+                    <div>
+                        <p class="text-xs text-gray-400">Hash ID</p>
+                        <p id="popup-tx-hash" class="font-mono text-sm text-yellow-400 break-all">Loading...</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-400">Amount</p>
+                        <p id="popup-tx-amount" class="text-2xl font-bold">-.-------- BTC</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-400">Fee</p>
+                        <p id="popup-tx-fee">-- SATS</p>
+                    </div>
+
+                    <div id="popup-tx-risk-section" class="hidden pt-2">
+                        <hr class="border-stone-700 my-2">
+                        <div>
+                            <p class="text-xs text-gray-400">Risk Analysis</p>
+                            <p id="popup-tx-risk-score" class="text-lg font-bold"></p>
+                            <ul id="popup-tx-risk-reasons" class="text-xs list-disc list-inside text-gray-400"></ul>
+                        </div>
+                    </div>
+
+                    <hr class="border-stone-700">
+                    <div>
+                        <p class="text-xs text-gray-400">From</p>
+                        <div id="popup-tx-from-summary">Loading...</div>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-400">To</p>
+                        <div id="popup-tx-to-summary">Loading...</div>
+                    </div>
+                    <div class="pt-2">
+                        <span id="popup-tx-status" class="text-sm font-medium me-2 px-2.5 py-0.5 rounded"></span>
+                    </div>
+                </div>
+
+                <!-- Right Content -->
+                <div class="w-full lg:w-2/3 p-5">
+                    <h3 class="font-bold text-lg mb-4">Advanced Details</h3>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-3 text-sm" id="popup-advanced-details">
+                        <!-- JS will populate this section -->
+                        <p class="col-span-3 text-center text-gray-500">Loading details...</p>
+                    </div>
+                    <hr class="border-stone-700 my-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                        <div>
+                            <h3 class="font-bold mb-2" id="popup-from-header">From (Inputs)</h3>
+                            <div id="popup-from-list" class="max-h-40 overflow-y-auto pr-2"></div>
+                        </div>
+                        <div>
+                            <h3 class="font-bold mb-2" id="popup-to-header">To (Outputs)</h3>
+                            <div id="popup-to-list" class="max-h-40 overflow-y-auto pr-2"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

@@ -1,0 +1,29 @@
+<!-- Dynamic Content for the Analyse Transaction Page -->
+<header class="mb-8">
+    <h1 class="text-2xl sm:text-3xl font-bold text-white text-center">Analyse Transaction</h1>
+    <p class="text-center text-gray-400 mt-2">Enter a transaction hash (TXID) to get a detailed analysis.</p>
+</header>
+
+<!-- Input Section -->
+<div class="luxury-card rounded-xl p-6">
+    <div class="flex flex-col sm:flex-row items-center gap-4">
+        <div class="flex-grow w-full">
+            <label for="tx-hash-input" class="sr-only">Transaction Hash</label>
+            <input type="text" id="tx-hash-input" placeholder="Enter transaction hash (TXID)..." class="w-full bg-stone-800 border border-stone-700 rounded-md p-3 focus:ring-yellow-500 focus:border-yellow-500 font-mono text-sm">
+        </div>
+        <button id="analyse-tx-button" class="bg-yellow-500 hover:bg-yellow-600 text-stone-900 font-bold px-6 py-3 rounded-md text-base shadow-lg transition-transform transform hover:scale-105 flex items-center justify-center space-x-2 w-full sm:w-auto">
+            <ion-icon name="search-outline" class="h-5 w-5"></ion-icon>
+            <span>Analyse</span>
+        </button>
+    </div>
+</div>
+
+<!-- Results Area -->
+<div id="analysis-results-container" class="mt-8">
+    <!-- Analysis results will be displayed here -->
+     <div class="text-center py-12 text-gray-500">
+        <ion-icon name="cube-outline" class="text-5xl"></ion-icon>
+        <p class="mt-2">Analysis results will appear here.</p>
+    </div>
+</div>
+
